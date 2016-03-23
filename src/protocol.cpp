@@ -17,21 +17,21 @@
 
 // Public testnet message start
 // unsigned char pchMessageStartTestBitcoin[4] = { 0xcf, 0xbf, 0xb5, 0xfc };
-static unsigned char pchMessageStartTestOld[4] = { 0xfc, 0xf1, 0xf2, 0xe1 };
-static unsigned char pchMessageStartTestNew[4] = { 0xf2, 0xe2, 0xc0, 0xe1 };
-static unsigned int nMessageStartTestSwitchTime = 1346200000;
+static unsigned char pchMessageStartTestOld[4] = { 0xf5, 0xf5, 0xf2, 0xe1 };
+static unsigned char pchMessageStartTestNew[4] = { 0xf5, 0xe5, 0xc0, 0xe1 };
+static unsigned int nMessageStartTestSwitchTime = 1458620400;
 
-// SuperTurbostake message start (switch from Bitcoin's in v0.2)
-static unsigned char pchMessageStartBitcoin[4] = { 0xfc, 0xbe, 0xfc, 0xb9};
-static unsigned char pchMessageStartSuperTurbostake[4] = { 0xfc, 0xb9, 0xb9, 0xe3 };
-static unsigned int nMessageStartSwitchTime = 1347300000;
+// spaceballz message start (switch from Bitcoin's in v0.2)
+static unsigned char pchMessageStartBitcoin[4] = { 0xf5, 0xf5, 0xfc, 0xb9};
+static unsigned char pchMessageStartspaceballz[4] = { 0xf5, 0xf5, 0xf5, 0xf5 };
+static unsigned int nMessageStartSwitchTime = 1458620400;
 
 void GetMessageStart(unsigned char pchMessageStart[], bool fPersistent)
 {
     if (fTestNet)
         memcpy(pchMessageStart, (fPersistent || GetAdjustedTime() > nMessageStartTestSwitchTime)? pchMessageStartTestNew : pchMessageStartTestOld, sizeof(pchMessageStartTestNew));
     else
-        memcpy(pchMessageStart, (fPersistent || GetAdjustedTime() > nMessageStartSwitchTime)? pchMessageStartSuperTurbostake : pchMessageStartBitcoin, sizeof(pchMessageStartSuperTurbostake));
+        memcpy(pchMessageStart, (fPersistent || GetAdjustedTime() > nMessageStartSwitchTime)? pchMessageStartspaceballz : pchMessageStartBitcoin, sizeof(pchMessageStartspaceballz));
 }
 
 static const char* ppszTypeName[] =
