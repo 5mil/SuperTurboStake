@@ -30,7 +30,7 @@ public:
     static void updateLabels(WalletModel*, QDialog*);
     static QString getPriorityLabel(double);
     
-    static QList<std::pair<QString, qint64> > payAddresses;
+    static QList<std::pair<QString, qint64_t> > payAddresses;
     static CCoinControl *coinControl;
 
 private:
@@ -62,8 +62,8 @@ private:
         COLUMN_PRIORITY,
         COLUMN_TXHASH,
         COLUMN_VOUT_INDEX,
-        COLUMN_AMOUNT_INT64,
-        COLUMN_PRIORITY_INT64
+        COLUMN_AMOUNT_int64_t,
+        COLUMN_PRIORITY_int64_t
     };
     
 private slots:

@@ -9,7 +9,7 @@ struct SendCoinsRecipient
 {
     QString address;
     QString label;
-    qint64 amount;
+    qint64_t amount;
 };
 */
 

@@ -24,7 +24,7 @@ class SendCoinsRecipient
 public:
     QString address;
     QString label;
-    qint64 amount;
+    qint64_t amount;
 };
 
 /** Interface to Bitcoin wallet from Qt view code. */
@@ -59,10 +59,10 @@ public:
     MintingTableModel *getMintingTableModel();
     TransactionTableModel *getTransactionTableModel();
 
-    qint64 getBalance() const;
-    qint64 getStake() const;
-    qint64 getNewMint() const;
-    qint64 getUnconfirmedBalance() const;
+    qint64_t getBalance() const;
+    qint64_t getStake() const;
+    qint64_t getNewMint() const;
+    qint64_t getUnconfirmedBalance() const;
     int getNumTransactions() const;
     EncryptionStatus getEncryptionStatus() const;
 
@@ -73,11 +73,11 @@ public:
     struct SendCoinsReturn
     {
         SendCoinsReturn(StatusCode status=Aborted,
-                         qint64 fee=0,
+                         qint64_t fee=0,
                          QString hex=QString()):
             status(status), fee(fee), hex(hex) {}
         StatusCode status;
-        qint64 fee; // is used in case status is "AmountWithFeeExceedsBalance"
+        qint64_t fee; // is used in case status is "AmountWithFeeExceedsBalance"
         QString hex; // is filled with the transaction hash if status is "OK"
     };
 
@@ -138,15 +138,15 @@ private:
     TransactionTableModel *transactionTableModel;
 
     // Cache some values to be able to detect changes
-    qint64 cachedBalance;
-    qint64 cachedStake;
-    qint64 cachedUnconfirmedBalance;
-    qint64 cachedNumTransactions;
+    qint64_t cachedBalance;
+    qint64_t cachedStake;
+    qint64_t cachedUnconfirmedBalance;
+    qint64_t cachedNumTransactions;
     EncryptionStatus cachedEncryptionStatus;
 
 signals:
     // Signal that balance in wallet changed
-    void balanceChanged(qint64 balance, qint64 stake, qint64 unconfirmedBalance);
+    void balanceChanged(qint64_t balance, qint64_t stake, qint64_t unconfirmedBalance);
 
     // Number of transactions in wallet changed
     void numTransactionsChanged(int count);

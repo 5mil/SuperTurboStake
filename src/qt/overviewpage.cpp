@@ -41,7 +41,7 @@ public:
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
-        qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
+        qint64_t amount = index.data(TransactionTableModel::AmountRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
         QVariant value = index.data(Qt::ForegroundRole);
         QColor foreground = option.palette.color(QPalette::Text);
@@ -133,7 +133,7 @@ OverviewPage::~OverviewPage()
     delete ui;
 }
 
-void OverviewPage::setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance)
+void OverviewPage::setBalance(qint64_t balance, qint64_t stake, qint64_t unconfirmedBalance)
 {
     int unit = model->getOptionsModel()->getDisplayUnit();
     currentBalance = balance;
@@ -180,7 +180,7 @@ void OverviewPage::setModel(WalletModel *model)
 
         // Keep up to date with wallet
         setBalance(model->getBalance(), model->getStake(), model->getUnconfirmedBalance());
-        connect(model, SIGNAL(balanceChanged(qint64, qint64, qint64)), this, SLOT(setBalance(qint64, qint64, qint64)));
+        connect(model, SIGNAL(balanceChanged(qint64_t, qint64_t, qint64_t)), this, SLOT(setBalance(qint64_t, qint64_t, qint64_t)));
 
         setNumTransactions(model->getNumTransactions());
         connect(model, SIGNAL(numTransactionsChanged(int)), this, SLOT(setNumTransactions(int)));

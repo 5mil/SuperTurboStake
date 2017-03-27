@@ -25,7 +25,7 @@ public:
     void setModel(WalletModel *model);
 
 public slots:
-    void setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance);
+    void setBalance(qint64_t balance, qint64_t stake, qint64_t unconfirmedBalance);
     void setNumTransactions(int count);
 
 signals:
@@ -37,9 +37,9 @@ protected:
 private:
     Ui::OverviewPage *ui;
     WalletModel *model;
-    qint64 currentBalance;
-    qint64 currentStake;
-    qint64 currentUnconfirmedBalance;
+    qint64_t currentBalance;
+    qint64_t currentStake;
+    qint64_t currentUnconfirmedBalance;
 
     TxViewDelegate *txdelegate;
     unsigned int numDisplayedTransactions();

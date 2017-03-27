@@ -378,7 +378,7 @@ bool AppInit2(int argc, char* argv[])
     //
     if (fDaemon)
         fprintf(stdout, "SuperTurbostake server starting\n");
-    int64 nStart;
+    int64_t nStart;
 
     InitMessage(_("Loading addresses..."));
     printf("Loading addresses...\n");
@@ -657,7 +657,7 @@ bool AppInit2(int argc, char* argv[])
 
     if (mapArgs.count("-reservebalance")) // SuperTurbostake: reserve balance amount
     {
-        int64 nReserveBalance = 0;
+        int64_t nReserveBalance = 0;
         if (!ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
         {
             ThreadSafeMessageBox(_("Invalid amount for -reservebalance=<amount>"), _("SuperTurbostake"), wxOK | wxMODAL);

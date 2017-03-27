@@ -23,22 +23,22 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     transactionTableModel = new TransactionTableModel(wallet, this);
 }
 
-qint64 WalletModel::getBalance() const
+qint64_t WalletModel::getBalance() const
 {
     return wallet->GetBalance();
 }
 
-qint64 WalletModel::getStake() const
+qint64_t WalletModel::getStake() const
 {
     return wallet->GetStake();
 }
 
-qint64 WalletModel::getNewMint() const
+qint64_t WalletModel::getNewMint() const
 {
     return wallet->GetNewMint();
 }
 
-qint64 WalletModel::getUnconfirmedBalance() const
+qint64_t WalletModel::getUnconfirmedBalance() const
 {
     return wallet->GetUnconfirmedBalance();
 }
@@ -55,9 +55,9 @@ int WalletModel::getNumTransactions() const
 
 void WalletModel::update()
 {
-    qint64 newBalance = getBalance();
-    qint64 newStake = getStake();
-    qint64 newUnconfirmedBalance = getUnconfirmedBalance() + getNewMint();
+    qint64_t newBalance = getBalance();
+    qint64_t newStake = getStake();
+    qint64_t newUnconfirmedBalance = getUnconfirmedBalance() + getNewMint();
     int newNumTransactions = getNumTransactions();
     EncryptionStatus newEncryptionStatus = getEncryptionStatus();
 
@@ -89,7 +89,7 @@ bool WalletModel::validateAddress(const QString &address)
 
 WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl)
 {
-    qint64 total = 0;
+    qint64_t total = 0;
     QSet<QString> setAddress;
     QString hex;
 
@@ -120,7 +120,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
     }
 
     // we do not use getBalance() here, because some coins could be locked or coin control could be active
-    int64 nBalance = 0;
+    int64_t nBalance = 0;
     std::vector<COutput> vCoins;
     wallet->AvailableCoins(vCoins, true, coinControl);
     BOOST_FOREACH(const COutput& out, vCoins)
@@ -140,7 +140,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         LOCK2(cs_main, wallet->cs_wallet);
 
         // Sendmany
-        std::vector<std::pair<CScript, int64> > vecSend;
+        std::vector<std::pair<CScript, int64_t> > vecSend;
         foreach(const SendCoinsRecipient &rcp, recipients)
         {
             CScript scriptPubKey;
@@ -150,7 +150,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
 
         CWalletTx wtx;
         CReserveKey keyChange(wallet);
-        int64 nFeeRequired = 0;
+        int64_t nFeeRequired = 0;
         bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, coinControl);
 
         if(!fCreated)

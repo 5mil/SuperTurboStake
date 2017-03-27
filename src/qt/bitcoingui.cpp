@@ -663,7 +663,7 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void BitcoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
+void BitcoinGUI::askFee(qint64_t nFeeRequired, bool *payFee)
 {
     QString strMessage =
         tr("This transaction is over the size limit. You can still send it for a fee of %1. Do you want to pay the fee?").arg(
@@ -679,7 +679,7 @@ void BitcoinGUI::incomingTransaction(const QModelIndex & parent, int start, int 
     if(!walletModel || !clientModel)
         return;
     TransactionTableModel *ttm = walletModel->getTransactionTableModel();
-    qint64 amount = ttm->index(start, TransactionTableModel::Amount, parent)
+    qint64_t amount = ttm->index(start, TransactionTableModel::Amount, parent)
                     .data(Qt::EditRole).toULongLong();
     if(!clientModel->inInitialBlockDownload())
     {

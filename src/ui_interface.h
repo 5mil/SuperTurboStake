@@ -5,7 +5,7 @@
 #define BITCOIN_UI_INTERFACE_H
 
 #include <string>
-#include "util.h" // for int64
+#include "util.h" // for int64_t
 
 #define wxYES                   0x00000002
 #define wxOK                    0x00000004
@@ -39,7 +39,7 @@
 /* These UI communication functions are implemented in bitcoin.cpp (for ui) and noui.cpp (no ui) */
 
 extern int ThreadSafeMessageBox(const std::string& message, const std::string& caption, int style=wxOK);
-extern bool ThreadSafeAskFee(int64 nFeeRequired, const std::string& strCaption);
+extern bool ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption);
 extern void ThreadSafeHandleURI(const std::string& strURI);
 extern void MainFrameRepaint();
 extern void AddressBookRepaint();

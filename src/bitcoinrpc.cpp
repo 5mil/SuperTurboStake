@@ -48,7 +48,7 @@ CReserveKey* pMiningKey = NULL;
 
 static std::string strRPCUserColonPass;
 
-static int64 nWalletUnlockTime;
+static int64_t nWalletUnlockTime;
 static CCriticalSection cs_nWalletUnlockTime;
 
 extern Value dumpprivkey(const Array& params, bool fHelp);
@@ -77,18 +77,18 @@ double GetDifficulty(const CBlockIndex* blockindex = NULL)
 }
 
 
-int64 AmountFromValue(const Value& value)
+int64_t AmountFromValue(const Value& value)
 {
     double dAmount = value.get_real();
     if (dAmount <= 0.0 || dAmount > MAX_MONEY)
         throw JSONRPCError(-3, "Invalid amount");
-    int64 nAmount = roundint64(dAmount * COIN);
+    int64_t nAmount = roundint64_t(dAmount * COIN);
     if (!MoneyRange(nAmount))
         throw JSONRPCError(-3, "Invalid amount");
     return nAmount;
 }
 
-Value ValueFromAmount(int64 amount)
+Value ValueFromAmount(int64_t amount)
 {
     return (double)amount / (double)COIN;
 }
@@ -114,7 +114,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
         entry.push_back(Pair("blockindex", wtx.nIndex));
     }
     entry.push_back(Pair("txid", wtx.GetHash().GetHex()));
-    entry.push_back(Pair("time", (boost::int64_t)wtx.GetTxTime()));
+    entry.push_back(Pair("time", (boost::int64_t_t)wtx.GetTxTime()));
     BOOST_FOREACH(const PAIRTYPE(string,string)& item, wtx.mapValue)
         entry.push_back(Pair(item.first, item.second));
 }
@@ -155,8 +155,8 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
 {
     entry.push_back(Pair("txid", tx.GetHash().GetHex()));
     entry.push_back(Pair("version", tx.nVersion));
-    entry.push_back(Pair("time", (boost::int64_t)tx.nTime));
-    entry.push_back(Pair("locktime", (boost::int64_t)tx.nLockTime));
+    entry.push_back(Pair("time", (boost::int64_t_t)tx.nTime));
+    entry.push_back(Pair("locktime", (boost::int64_t_t)tx.nLockTime));
     Array vin;
     BOOST_FOREACH(const CTxIn& txin, tx.vin)
     {
@@ -166,13 +166,13 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
         else
         {
             in.push_back(Pair("txid", txin.prevout.hash.GetHex()));
-            in.push_back(Pair("vout", (boost::int64_t)txin.prevout.n));
+            in.push_back(Pair("vout", (boost::int64_t_t)txin.prevout.n));
             Object o;
             o.push_back(Pair("asm", txin.scriptSig.ToString()));
             o.push_back(Pair("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end())));
             in.push_back(Pair("scriptSig", o));
         }
-        in.push_back(Pair("sequence", (boost::int64_t)txin.nSequence));
+        in.push_back(Pair("sequence", (boost::int64_t_t)txin.nSequence));
         vin.push_back(in);
     }
     entry.push_back(Pair("vin", vin));
@@ -182,7 +182,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
         const CTxOut& txout = tx.vout[i];
         Object out;
         out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        out.push_back(Pair("n", (boost::int64_t)i));
+        out.push_back(Pair("n", (boost::int64_t_t)i));
         Object o;
         ScriptPubKeyToJSON(txout.scriptPubKey, o);
         out.push_back(Pair("scriptPubKey", o));
@@ -200,7 +200,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
             if (pindex->IsInMainChain())
             {
                 entry.push_back(Pair("confirmations", 1 + nBestHeight - pindex->nHeight));
-                entry.push_back(Pair("blocktime", (boost::int64_t)pindex->nTime));
+                entry.push_back(Pair("blocktime", (boost::int64_t_t)pindex->nTime));
             }
             else
                 entry.push_back(Pair("confirmations", 0));
@@ -233,7 +233,7 @@ void TxToJSON(const CTransaction& tx, Object& txdata)
             vin.push_back(Pair("vout", (int)txin.prevout.n));
         }
 
-        vin.push_back(Pair("sequence", (boost::uint64_t)txin.nSequence));
+        vin.push_back(Pair("sequence", (boost::uint64_t_t)txin.nSequence));
 
         vins.push_back(vin);
     }
@@ -290,7 +290,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fTxI
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
     result.push_back(Pair("time", DateTimeStrFormat(block.GetBlockTime())));
-    result.push_back(Pair("nonce", (boost::uint64_t)block.nNonce));
+    result.push_back(Pair("nonce", (boost::uint64_t_t)block.nNonce));
     result.push_back(Pair("bits", HexBits(block.nBits)));
     result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
     result.push_back(Pair("mint", ValueFromAmount(blockindex->nMint)));
@@ -462,13 +462,13 @@ Value getpeerinfo(const Array& params, bool fHelp)
 
         obj.push_back(Pair("addr", stats.addrName));
         obj.push_back(Pair("services", strprintf("%08"PRI64x, stats.nServices)));
-        obj.push_back(Pair("lastsend", (boost::int64_t)stats.nLastSend));
-        obj.push_back(Pair("lastrecv", (boost::int64_t)stats.nLastRecv));
-        obj.push_back(Pair("conntime", (boost::int64_t)stats.nTimeConnected));
+        obj.push_back(Pair("lastsend", (boost::int64_t_t)stats.nLastSend));
+        obj.push_back(Pair("lastrecv", (boost::int64_t_t)stats.nLastRecv));
+        obj.push_back(Pair("conntime", (boost::int64_t_t)stats.nTimeConnected));
         obj.push_back(Pair("version", stats.nVersion));
         obj.push_back(Pair("subver", stats.strSubVer));
         obj.push_back(Pair("inbound", stats.fInbound));
-        obj.push_back(Pair("releasetime", (boost::int64_t)stats.nReleaseTime));
+        obj.push_back(Pair("releasetime", (boost::int64_t_t)stats.nReleaseTime));
         obj.push_back(Pair("height", stats.nStartingHeight));
         obj.push_back(Pair("banscore", stats.nMisbehavior));
 
@@ -539,8 +539,8 @@ Value gethashespersec(const Array& params, bool fHelp)
             "Returns a recent hashes per second performance measurement while generating.");
 
     if (GetTimeMillis() - nHPSTimerStart > 8000)
-        return (boost::int64_t)0;
-    return (boost::int64_t)dHashesPerSec;
+        return (boost::int64_t_t)0;
+    return (boost::int64_t_t)dHashesPerSec;
 }
 
 
@@ -552,9 +552,9 @@ Value getnetworkghps(const Array& params, bool fHelp)
             "getnetworkghps\n"
             "Returns a recent Ghash/second network mining estimate.");
 
-    int64 nTargetSpacingWorkMin = 30;
-    int64 nTargetSpacingWork = nTargetSpacingWorkMin;
-    int64 nInterval = 72;
+    int64_t nTargetSpacingWorkMin = 30;
+    int64_t nTargetSpacingWork = nTargetSpacingWorkMin;
+    int64_t nInterval = 72;
     CBlockIndex* pindex = pindexGenesisBlock;
     CBlockIndex* pindexPrevWork = pindexGenesisBlock;
     while (pindex)
@@ -562,7 +562,7 @@ Value getnetworkghps(const Array& params, bool fHelp)
         // Exponential moving average of recent proof-of-work block spacing
         if (pindex->IsProofOfWork())
         {
-            int64 nActualSpacingWork = pindex->GetBlockTime() - pindexPrevWork->GetBlockTime();
+            int64_t nActualSpacingWork = pindex->GetBlockTime() - pindexPrevWork->GetBlockTime();
             nTargetSpacingWork = ((nInterval - 1) * nTargetSpacingWork + nActualSpacingWork + nActualSpacingWork) / (nInterval + 1);
             nTargetSpacingWork = max(nTargetSpacingWork, nTargetSpacingWorkMin);
             pindexPrevWork = pindex;
@@ -595,11 +595,11 @@ Value getinfo(const Array& params, bool fHelp)
     obj.push_back(Pair("ip",            addrSeenByPeer.ToStringIP()));
     obj.push_back(Pair("difficulty",    (double)GetDifficulty()));
     obj.push_back(Pair("testnet",       fTestNet));
-    obj.push_back(Pair("keypoololdest", (boost::int64_t)pwalletMain->GetOldestKeyPoolTime()));
+    obj.push_back(Pair("keypoololdest", (boost::int64_t_t)pwalletMain->GetOldestKeyPoolTime()));
     obj.push_back(Pair("keypoolsize",   pwalletMain->GetKeyPoolSize()));
     obj.push_back(Pair("paytxfee",      ValueFromAmount(nTransactionFee)));
     if (pwalletMain->IsCrypted())
-        obj.push_back(Pair("unlocked_until", (boost::int64_t)nWalletUnlockTime / 1000));
+        obj.push_back(Pair("unlocked_until", (boost::int64_t_t)nWalletUnlockTime / 1000));
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
     return obj;
 }
@@ -614,15 +614,15 @@ Value getmininginfo(const Array& params, bool fHelp)
 
     Object obj;
     obj.push_back(Pair("blocks",        (int)nBestHeight));
-    obj.push_back(Pair("currentblocksize",(uint64_t)nLastBlockSize));
-    obj.push_back(Pair("currentblocktx",(uint64_t)nLastBlockTx));
+    obj.push_back(Pair("currentblocksize",(uint64_t_t)nLastBlockSize));
+    obj.push_back(Pair("currentblocktx",(uint64_t_t)nLastBlockTx));
     obj.push_back(Pair("difficulty",    (double)GetDifficulty()));
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
     obj.push_back(Pair("generate",      GetBoolArg("-gen")));
     obj.push_back(Pair("genproclimit",  (int)GetArg("-genproclimit", -1)));
     obj.push_back(Pair("hashespersec",  gethashespersec(params, false)));
     obj.push_back(Pair("networkghps",   getnetworkghps(params, false)));
-    obj.push_back(Pair("pooledtx",      (uint64_t)mempool.size()));
+    obj.push_back(Pair("pooledtx",      (uint64_t_t)mempool.size()));
     obj.push_back(Pair("testnet",       fTestNet));
     return obj;
 }
@@ -814,7 +814,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
         throw JSONRPCError(-5, "Invalid SuperTurbostake address");
 
     // Amount
-    int64 nAmount = AmountFromValue(params[1]);
+    int64_t nAmount = AmountFromValue(params[1]);
     if (nAmount < MIN_TXOUT_AMOUNT)
         throw JSONRPCError(-101, "Send amount too small");
 
@@ -930,7 +930,7 @@ Value getreceivedbyaddress(const Array& params, bool fHelp)
         nMinDepth = params[1].get_int();
 
     // Tally
-    int64 nAmount = 0;
+    int64_t nAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
@@ -1053,7 +1053,7 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
     GetAccountAddresses(strAccount, setAddress);
 
     // Tally
-    int64 nAmount = 0;
+    int64_t nAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
@@ -1073,9 +1073,9 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
 }
 
 
-int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth)
+int64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth)
 {
-    int64 nBalance = 0;
+    int64_t nBalance = 0;
 
     // Tally wallet transactions
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
@@ -1084,7 +1084,7 @@ int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinD
         if (!wtx.IsFinal())
             continue;
 
-        int64 nGenerated, nReceived, nSent, nFee;
+        int64_t nGenerated, nReceived, nSent, nFee;
         wtx.GetAccountAmounts(strAccount, nGenerated, nReceived, nSent, nFee);
 
         if (nReceived != 0 && wtx.GetDepthInMainChain() >= nMinDepth)
@@ -1098,7 +1098,7 @@ int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinD
     return nBalance;
 }
 
-int64 GetAccountBalance(const string& strAccount, int nMinDepth)
+int64_t GetAccountBalance(const string& strAccount, int nMinDepth)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
     return GetAccountBalance(walletdb, strAccount, nMinDepth);
@@ -1124,25 +1124,25 @@ Value getbalance(const Array& params, bool fHelp)
         // Calculate total balance a different way from GetBalance()
         // (GetBalance() sums up all unspent TxOuts)
         // getbalance and getbalance '*' should always return the same number.
-        int64 nBalance = 0;
+        int64_t nBalance = 0;
         for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
         {
             const CWalletTx& wtx = (*it).second;
             if (!wtx.IsFinal())
                 continue;
 
-            int64 allGeneratedImmature, allGeneratedMature, allFee;
+            int64_t allGeneratedImmature, allGeneratedMature, allFee;
             allGeneratedImmature = allGeneratedMature = allFee = 0;
             string strSentAccount;
-            list<pair<CTxDestination, int64> > listReceived;
-            list<pair<CTxDestination, int64> > listSent;
+            list<pair<CTxDestination, int64_t> > listReceived;
+            list<pair<CTxDestination, int64_t> > listSent;
             wtx.GetAmounts(allGeneratedImmature, allGeneratedMature, listReceived, listSent, allFee, strSentAccount);
             if (wtx.GetDepthInMainChain() >= nMinDepth)
             {
-                BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64)& r, listReceived)
+                BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64_t)& r, listReceived)
                     nBalance += r.second;
             }
-            BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64)& r, listSent)
+            BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64_t)& r, listSent)
                 nBalance -= r.second;
             nBalance -= allFee;
             nBalance += allGeneratedMature;
@@ -1152,7 +1152,7 @@ Value getbalance(const Array& params, bool fHelp)
 
     string strAccount = AccountFromValue(params[0]);
 
-    int64 nBalance = GetAccountBalance(strAccount, nMinDepth);
+    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
 
     return ValueFromAmount(nBalance);
 }
@@ -1167,7 +1167,7 @@ Value movecmd(const Array& params, bool fHelp)
 
     string strFrom = AccountFromValue(params[0]);
     string strTo = AccountFromValue(params[1]);
-    int64 nAmount = AmountFromValue(params[2]);
+    int64_t nAmount = AmountFromValue(params[2]);
     if (params.size() > 3)
         // unused parameter, used to be nMinDepth, keep type-checking it though
         (void)params[3].get_int();
@@ -1179,7 +1179,7 @@ Value movecmd(const Array& params, bool fHelp)
     if (!walletdb.TxnBegin())
         throw JSONRPCError(-20, "database error");
 
-    int64 nNow = GetAdjustedTime();
+    int64_t nNow = GetAdjustedTime();
 
     // Debit
     CAccountingEntry debit;
@@ -1222,7 +1222,7 @@ Value sendfrom(const Array& params, bool fHelp)
     CBitcoinAddress address(params[1].get_str());
     if (!address.IsValid())
         throw JSONRPCError(-5, "Invalid SuperTurbostake address");
-    int64 nAmount = AmountFromValue(params[2]);
+    int64_t nAmount = AmountFromValue(params[2]);
     if (nAmount < MIN_TXOUT_AMOUNT)
         throw JSONRPCError(-101, "Send amount too small");
     int nMinDepth = 1;
@@ -1240,7 +1240,7 @@ Value sendfrom(const Array& params, bool fHelp)
         throw JSONRPCError(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
     // Check funds
-    int64 nBalance = GetAccountBalance(strAccount, nMinDepth);
+    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
     if (nAmount > nBalance)
         throw JSONRPCError(-6, "Account has insufficient funds");
 
@@ -1285,9 +1285,9 @@ Value sendmany(const Array& params, bool fHelp)
         wtx.mapValue["comment"] = params[3].get_str();
 
     set<CBitcoinAddress> setAddress;
-    vector<pair<CScript, int64> > vecSend;
+    vector<pair<CScript, int64_t> > vecSend;
 
-    int64 totalAmount = 0;
+    int64_t totalAmount = 0;
     BOOST_FOREACH(const Pair& s, sendTo)
     {
         CBitcoinAddress address(s.name_);
@@ -1300,7 +1300,7 @@ Value sendmany(const Array& params, bool fHelp)
 
         CScript scriptPubKey;
         scriptPubKey.SetDestination(address.Get());
-        int64 nAmount = AmountFromValue(s.value_); 
+        int64_t nAmount = AmountFromValue(s.value_); 
         if (nAmount < MIN_TXOUT_AMOUNT)
             throw JSONRPCError(-101, "Send amount too small");
         totalAmount += nAmount;
@@ -1316,20 +1316,20 @@ Value sendmany(const Array& params, bool fHelp)
     // Check funds
     if (fFromAllAccounts)
     {
-        int64 nBalance = pwalletMain->GetBalance();
+        int64_t nBalance = pwalletMain->GetBalance();
         if (totalAmount > nBalance)
             throw JSONRPCError(-6, "Wallet has insufficient funds");
     }
     else
     {
-        int64 nBalance = GetAccountBalance(strAccount, nMinDepth);
+        int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
         if (totalAmount > nBalance)
             throw JSONRPCError(-6, "Account has insufficient funds");
     }
 
     // Send
     CReserveKey keyChange(pwalletMain);
-    int64 nFeeRequired = 0;
+    int64_t nFeeRequired = 0;
     bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired);
     if (!fCreated)
     {
@@ -1345,7 +1345,7 @@ Value sendmany(const Array& params, bool fHelp)
 
 struct tallyitem
 {
-    int64 nAmount;
+    int64_t nAmount;
     int nConf;
     tallyitem()
     {
@@ -1402,7 +1402,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
         if (it == mapTally.end() && !fIncludeEmpty)
             continue;
 
-        int64 nAmount = 0;
+        int64_t nAmount = 0;
         int nConf = std::numeric_limits<int>::max();
         if (it != mapTally.end())
         {
@@ -1431,7 +1431,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
     {
         for (map<string, tallyitem>::iterator it = mapAccountTally.begin(); it != mapAccountTally.end(); ++it)
         {
-            int64 nAmount = (*it).second.nAmount;
+            int64_t nAmount = (*it).second.nAmount;
             int nConf = (*it).second.nConf;
             Object obj;
             obj.push_back(Pair("account",       (*it).first));
@@ -1477,10 +1477,10 @@ Value listreceivedbyaccount(const Array& params, bool fHelp)
 
 void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret)
 {
-    int64 nGeneratedImmature, nGeneratedMature, nFee;
+    int64_t nGeneratedImmature, nGeneratedMature, nFee;
     string strSentAccount;
-    list<pair<CTxDestination, int64> > listReceived;
-    list<pair<CTxDestination, int64> > listSent;
+    list<pair<CTxDestination, int64_t> > listReceived;
+    list<pair<CTxDestination, int64_t> > listSent;
 
     wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount);
 
@@ -1514,7 +1514,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Sent
     if ((!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
     {
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& s, listSent)
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
         {
             Object entry;
             entry.push_back(Pair("account", strSentAccount));
@@ -1531,7 +1531,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Received
     if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth)
     {
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& r, listReceived)
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
         {
             string account;
             if (pwalletMain->mapAddressBook.count(r.first))
@@ -1560,7 +1560,7 @@ void AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, Ar
         Object entry;
         entry.push_back(Pair("account", acentry.strAccount));
         entry.push_back(Pair("category", "move"));
-        entry.push_back(Pair("time", (boost::int64_t)acentry.nTime));
+        entry.push_back(Pair("time", (boost::int64_t_t)acentry.nTime));
         entry.push_back(Pair("amount", ValueFromAmount(acentry.nCreditDebit)));
         entry.push_back(Pair("otheraccount", acentry.strOtherAccount));
         entry.push_back(Pair("comment", acentry.strComment));
@@ -1595,7 +1595,7 @@ Value listtransactions(const Array& params, bool fHelp)
 
     // First: get all CWalletTx and CAccountingEntry into a sorted-by-time multimap.
     typedef pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef multimap<int64, TxPair > TxItems;
+    typedef multimap<int64_t, TxPair > TxItems;
     TxItems txByTime;
 
     // Note: maintaining indices in the database of (account,time) --> txid and (account, time) --> acentry
@@ -1654,7 +1654,7 @@ Value listaccounts(const Array& params, bool fHelp)
     if (params.size() > 0)
         nMinDepth = params[0].get_int();
 
-    map<string, int64> mapAccountBalances;
+    map<string, int64_t> mapAccountBalances;
     BOOST_FOREACH(const PAIRTYPE(CTxDestination, string)& entry, pwalletMain->mapAddressBook) {
         if (IsMine(*pwalletMain, entry.first)) // This address belongs to me
             mapAccountBalances[entry.second] = 0;
@@ -1663,18 +1663,18 @@ Value listaccounts(const Array& params, bool fHelp)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        int64 nGeneratedImmature, nGeneratedMature, nFee;
+        int64_t nGeneratedImmature, nGeneratedMature, nFee;
         string strSentAccount;
-        list<pair<CTxDestination, int64> > listReceived;
-        list<pair<CTxDestination, int64> > listSent;
+        list<pair<CTxDestination, int64_t> > listReceived;
+        list<pair<CTxDestination, int64_t> > listSent;
         wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount);
         mapAccountBalances[strSentAccount] -= nFee;
-        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& s, listSent)
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
             mapAccountBalances[strSentAccount] -= s.second;
         if (wtx.GetDepthInMainChain() >= nMinDepth)
         {
             mapAccountBalances[""] += nGeneratedMature;
-            BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& r, listReceived)
+            BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
                 if (pwalletMain->mapAddressBook.count(r.first))
                     mapAccountBalances[pwalletMain->mapAddressBook[r.first]] += r.second;
                 else
@@ -1688,7 +1688,7 @@ Value listaccounts(const Array& params, bool fHelp)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
     Object ret;
-    BOOST_FOREACH(const PAIRTYPE(string, int64)& accountBalance, mapAccountBalances) {
+    BOOST_FOREACH(const PAIRTYPE(string, int64_t)& accountBalance, mapAccountBalances) {
         ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
     }
     return ret;
@@ -1773,10 +1773,10 @@ Value gettransaction(const Array& params, bool fHelp)
         throw JSONRPCError(-5, "Invalid or non-wallet transaction id");
     const CWalletTx& wtx = pwalletMain->mapWallet[hash];
 
-    int64 nCredit = wtx.GetCredit();
-    int64 nDebit = wtx.GetDebit();
-    int64 nNet = nCredit - nDebit;
-    int64 nFee = (wtx.IsFromMe() ? wtx.GetValueOut() - nDebit : 0);
+    int64_t nCredit = wtx.GetCredit();
+    int64_t nDebit = wtx.GetDebit();
+    int64_t nNet = nCredit - nDebit;
+    int64_t nFee = (wtx.IsFromMe() ? wtx.GetValueOut() - nDebit : 0);
 
     entry.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
     if (wtx.IsFromMe())
@@ -1836,7 +1836,7 @@ void ThreadTopUpKeyPool(void* parg)
 
 void ThreadCleanWalletPassphrase(void* parg)
 {
-    int64 nMyWakeTime = GetTimeMillis() + *((int64*)parg) * 1000;
+    int64_t nMyWakeTime = GetTimeMillis() + *((int64_t*)parg) * 1000;
 
     ENTER_CRITICAL_SECTION(cs_nWalletUnlockTime);
 
@@ -1848,7 +1848,7 @@ void ThreadCleanWalletPassphrase(void* parg)
         {
             if (nWalletUnlockTime==0)
                 break;
-            int64 nToSleep = nWalletUnlockTime - GetTimeMillis();
+            int64_t nToSleep = nWalletUnlockTime - GetTimeMillis();
             if (nToSleep <= 0)
                 break;
 
@@ -1872,7 +1872,7 @@ void ThreadCleanWalletPassphrase(void* parg)
 
     LEAVE_CRITICAL_SECTION(cs_nWalletUnlockTime);
 
-    delete (int64*)parg;
+    delete (int64_t*)parg;
 }
 
 Value walletpassphrase(const Array& params, bool fHelp)
@@ -1908,7 +1908,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
             "Stores the wallet decryption key in memory for <timeout> seconds.");
 
     CreateThread(ThreadTopUpKeyPool, NULL);
-    int64* pnSleepTime = new int64(params[1].get_int64());
+    int64_t* pnSleepTime = new int64_t(params[1].get_int64_t());
     CreateThread(ThreadCleanWalletPassphrase, pnSleepTime);
 
     // SuperTurbostake: if user OS account compromised prevent trivial sendmoney commands
@@ -2100,7 +2100,7 @@ Value getwork(const Array& params, bool fHelp)
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
-        static int64 nStart;
+        static int64_t nStart;
         static CBlock* pblock;
         if (pindexPrev != pindexBest ||
             (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 60))
@@ -2227,7 +2227,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
-        static int64 nStart;
+        static int64_t nStart;
         static CBlock* pblock;
         if (pindexPrev != pindexBest ||
             (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 5))
@@ -2259,7 +2259,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
         pblock->nNonce = 0;
 
         Array transactions;
-        map<uint256, int64_t> setTxIndex;
+        map<uint256, int64_t_t> setTxIndex;
         int i = 0;
         CTxDB txdb("r");
         BOOST_FOREACH (CTransaction& tx, pblock->vtx)
@@ -2283,7 +2283,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
             bool fInvalid = false;
             if (tx.FetchInputs(txdb, mapUnused, false, false, mapInputs, fInvalid))
             {
-                entry.push_back(Pair("fee", (int64_t)(tx.GetValueIn(mapInputs) - tx.GetValueOut())));
+                entry.push_back(Pair("fee", (int64_t_t)(tx.GetValueIn(mapInputs) - tx.GetValueOut())));
 
                 Array deps;
                 BOOST_FOREACH (MapPrevTx::value_type& inp, mapInputs)
@@ -2293,7 +2293,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
                 }
                 entry.push_back(Pair("depends", deps));
 
-                int64_t nSigOps = tx.GetLegacySigOpCount();
+                int64_t_t nSigOps = tx.GetLegacySigOpCount();
                 nSigOps += tx.GetP2SHSigOpCount(mapInputs);
                 entry.push_back(Pair("sigops", nSigOps));
             }
@@ -2319,16 +2319,16 @@ Value getblocktemplate(const Array& params, bool fHelp)
         result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
         result.push_back(Pair("transactions", transactions));
         result.push_back(Pair("coinbaseaux", aux));
-        result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue));
+        result.push_back(Pair("coinbasevalue", (int64_t_t)pblock->vtx[0].vout[0].nValue));
         result.push_back(Pair("target", hashTarget.GetHex()));
-        result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1));
+        result.push_back(Pair("mintime", (int64_t_t)pindexPrev->GetMedianTimePast()+1));
         result.push_back(Pair("mutable", aMutable));
         result.push_back(Pair("noncerange", "00000000ffffffff"));
-        result.push_back(Pair("sigoplimit", (int64_t)MAX_BLOCK_SIGOPS));
-        result.push_back(Pair("sizelimit", (int64_t)MAX_BLOCK_SIZE));
-        result.push_back(Pair("curtime", (int64_t)pblock->nTime));
+        result.push_back(Pair("sigoplimit", (int64_t_t)MAX_BLOCK_SIGOPS));
+        result.push_back(Pair("sizelimit", (int64_t_t)MAX_BLOCK_SIZE));
+        result.push_back(Pair("curtime", (int64_t_t)pblock->nTime));
         result.push_back(Pair("bits", HexBits(pblock->nBits)));
-        result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight+1)));
+        result.push_back(Pair("height", (int64_t_t)(pindexPrev->nHeight+1)));
 
         return result;
     }
@@ -2449,7 +2449,7 @@ Value reservebalance(const Array& params, bool fHelp)
         {
             if (params.size() == 1)
                 throw runtime_error("must provide amount to reserve balance.\n");
-            int64 nAmount = AmountFromValue(params[1]);
+            int64_t nAmount = AmountFromValue(params[1]);
             nAmount = (nAmount / CENT) * CENT;  // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
@@ -2464,7 +2464,7 @@ Value reservebalance(const Array& params, bool fHelp)
     }
 
     Object result;
-    int64 nReserveBalance = 0;
+    int64_t nReserveBalance = 0;
     if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
         throw runtime_error("invalid reserve balance amount\n");
     result.push_back(Pair("reserve", (nReserveBalance > 0)));
@@ -2482,7 +2482,7 @@ Value checkwallet(const Array& params, bool fHelp)
             "Check wallet for integrity.\n");
 
     int nMismatchSpent;
-    int64 nBalanceInQuestion;
+    int64_t nBalanceInQuestion;
     pwalletMain->FixSpentCoins(nMismatchSpent, nBalanceInQuestion, true);
     Object result;
     if (nMismatchSpent == 0)
@@ -2505,7 +2505,7 @@ Value repairwallet(const Array& params, bool fHelp)
             "Repair wallet if checkwallet reports any problem.\n");
 
     int nMismatchSpent;
-    int64 nBalanceInQuestion;
+    int64_t nBalanceInQuestion;
     pwalletMain->FixSpentCoins(nMismatchSpent, nBalanceInQuestion);
     Object result;
     if (nMismatchSpent == 0)
@@ -2825,7 +2825,7 @@ Value listunspent(const Array& params, bool fHelp)
                 continue;
         }
 
-        int64 nValue = out.tx->vout[out.i].nValue;
+        int64_t nValue = out.tx->vout[out.i].nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         CTxDestination address;
         Object entry;
@@ -2898,7 +2898,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
 
         CScript scriptPubKey;
         scriptPubKey.SetDestination(address.Get());
-        int64 nAmount = AmountFromValue(s.value_);
+        int64_t nAmount = AmountFromValue(s.value_);
 
         CTxOut out(nAmount, scriptPubKey);
         rawTx.vout.push_back(out);
@@ -4007,35 +4007,35 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     // Special case non-string parameter types
     //
     if (strMethod == "setgenerate"            && n > 0) ConvertTo<bool>(params[0]);
-    if (strMethod == "setgenerate"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "setgenerate"            && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
     if (strMethod == "sendtoaddress"          && n > 1) ConvertTo<double>(params[1]);
     if (strMethod == "settxfee"               && n > 0) ConvertTo<double>(params[0]);
-    if (strMethod == "getreceivedbyaddress"   && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "getreceivedbyaccount"   && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "listreceivedbyaddress"  && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "getreceivedbyaddress"   && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "getreceivedbyaccount"   && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "listreceivedbyaddress"  && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
     if (strMethod == "listreceivedbyaddress"  && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "listreceivedbyaccount"  && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "listreceivedbyaccount"  && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
     if (strMethod == "listreceivedbyaccount"  && n > 1) ConvertTo<bool>(params[1]);
-    if (strMethod == "getbalance"             && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "getblockhash"           && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "getbalance"             && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "getblockhash"           && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
     if (strMethod == "getblock"               && n > 1) ConvertTo<bool>(params[1]);
     if (strMethod == "getblock"               && n > 2) ConvertTo<bool>(params[2]);
     if (strMethod == "move"                   && n > 2) ConvertTo<double>(params[2]);
-    if (strMethod == "move"                   && n > 3) ConvertTo<boost::int64_t>(params[3]);
+    if (strMethod == "move"                   && n > 3) ConvertTo<boost::int64_t_t>(params[3]);
     if (strMethod == "sendfrom"               && n > 2) ConvertTo<double>(params[2]);
-    if (strMethod == "sendfrom"               && n > 3) ConvertTo<boost::int64_t>(params[3]);
-    if (strMethod == "listtransactions"       && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "listtransactions"       && n > 2) ConvertTo<boost::int64_t>(params[2]);
-    if (strMethod == "listaccounts"           && n > 0) ConvertTo<boost::int64_t>(params[0]);
-    if (strMethod == "walletpassphrase"       && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "sendfrom"               && n > 3) ConvertTo<boost::int64_t_t>(params[3]);
+    if (strMethod == "listtransactions"       && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "listtransactions"       && n > 2) ConvertTo<boost::int64_t_t>(params[2]);
+    if (strMethod == "listaccounts"           && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
+    if (strMethod == "walletpassphrase"       && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
     if (strMethod == "walletpassphrase"       && n > 2) ConvertTo<bool>(params[2]);
     if (strMethod == "getblocktemplate"       && n > 0) ConvertTo<Object>(params[0]);
-    if (strMethod == "listsinceblock"         && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "sendalert"              && n > 2) ConvertTo<boost::int64_t>(params[2]);
-    if (strMethod == "sendalert"              && n > 3) ConvertTo<boost::int64_t>(params[3]);
-    if (strMethod == "sendalert"              && n > 4) ConvertTo<boost::int64_t>(params[4]);
-    if (strMethod == "sendalert"              && n > 5) ConvertTo<boost::int64_t>(params[5]);
-    if (strMethod == "sendalert"              && n > 6) ConvertTo<boost::int64_t>(params[6]);
+    if (strMethod == "listsinceblock"         && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "sendalert"              && n > 2) ConvertTo<boost::int64_t_t>(params[2]);
+    if (strMethod == "sendalert"              && n > 3) ConvertTo<boost::int64_t_t>(params[3]);
+    if (strMethod == "sendalert"              && n > 4) ConvertTo<boost::int64_t_t>(params[4]);
+    if (strMethod == "sendalert"              && n > 5) ConvertTo<boost::int64_t_t>(params[5]);
+    if (strMethod == "sendalert"              && n > 6) ConvertTo<boost::int64_t_t>(params[6]);
     if (strMethod == "sendmany"               && n > 1)
     {
         string s = params[1].get_str();
@@ -4044,10 +4044,10 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
             throw runtime_error("type mismatch");
         params[1] = v.get_obj();
     }
-    if (strMethod == "sendmany"                && n > 2) ConvertTo<boost::int64_t>(params[2]);
+    if (strMethod == "sendmany"                && n > 2) ConvertTo<boost::int64_t_t>(params[2]);
     if (strMethod == "reservebalance"          && n > 0) ConvertTo<bool>(params[0]);
     if (strMethod == "reservebalance"          && n > 1) ConvertTo<double>(params[1]);
-    if (strMethod == "createmultisig"          && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "createmultisig"          && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
     if (strMethod == "createmultisig"          && n > 1)
     {
         string s = params[1].get_str();
@@ -4056,7 +4056,7 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
             throw runtime_error("type mismatch "+s);
         params[1] = v.get_array();
     }
-    if (strMethod == "addmultisigaddress"      && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "addmultisigaddress"      && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
     if (strMethod == "addmultisigaddress"      && n > 1)
     {
         string s = params[1].get_str();
@@ -4065,19 +4065,19 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
             throw runtime_error("type mismatch "+s);
         params[1] = v.get_array();
     }
-    if (strMethod == "listunspent"            && n > 0) ConvertTo<boost::int64_t>(params[0]);
-    if (strMethod == "listunspent"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "listunspent"            && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
+    if (strMethod == "listunspent"            && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
     if (strMethod == "listunspent"            && n > 2) ConvertTo<Array>(params[2]);
-    if (strMethod == "getrawtransaction"      && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "getrawtransaction"      && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
     if (strMethod == "createrawtransaction"   && n > 0) ConvertTo<Array>(params[0]);
     if (strMethod == "createrawtransaction"   && n > 1) ConvertTo<Object>(params[1]);
     if (strMethod == "signrawtransaction"     && n > 1) ConvertTo<Array>(params[1]);
     if (strMethod == "signrawtransaction"     && n > 2) ConvertTo<Array>(params[2]);
-    if (strMethod == "sendrawtransaction"     && n > 1) ConvertTo<boost::int64_t>(params[1]);
-    if (strMethod == "gettxout"               && n > 1) ConvertTo<int64_t>(params[1]);
+    if (strMethod == "sendrawtransaction"     && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
+    if (strMethod == "gettxout"               && n > 1) ConvertTo<int64_t_t>(params[1]);
     if (strMethod == "gettxout"               && n > 2) ConvertTo<bool>(params[2]);
-    if (strMethod == "listminting"            && n > 0) ConvertTo<boost::int64_t>(params[0]);
-    if (strMethod == "listminting"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
+    if (strMethod == "listminting"            && n > 0) ConvertTo<boost::int64_t_t>(params[0]);
+    if (strMethod == "listminting"            && n > 1) ConvertTo<boost::int64_t_t>(params[1]);
     return params;
 }
 
