@@ -91,13 +91,13 @@ void SendCoinsDialog::setModel(WalletModel *model)
     if(model)
     {
         setBalance(model->getBalance(), model->getStake(), model->getUnconfirmedBalance());
-        connect(model, SIGNAL(balanceChanged(qint64_t, qint64_t, qint64_t)), this, SLOT(setBalance(qint64_t, qint64_t, qint64_t)));
+        connect(model, SIGNAL(balanceChanged(qint64, qint64, qint64)), this, SLOT(setBalance(qint64, qint64, qint64)));
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
         // Coin Control
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(coinControlUpdateLabels()));
         connect(model->getOptionsModel(), SIGNAL(coinControlFeaturesChanged(bool)), this, SLOT(coinControlFeatureChanged(bool)));
-        connect(model->getOptionsModel(), SIGNAL(transactionFeeChanged(qint64_t)), this, SLOT(coinControlUpdateLabels()));
+        connect(model->getOptionsModel(), SIGNAL(transactionFeeChanged(qint64)), this, SLOT(coinControlUpdateLabels()));
         ui->frameCoinControl->setVisible(model->getOptionsModel()->getCoinControlFeatures());
         coinControlUpdateLabels(); 
     }
@@ -336,7 +336,7 @@ void SendCoinsDialog::handleURI(const QString &uri)
     pasteEntry(rv);
 }
 
-void SendCoinsDialog::setBalance(qint64_t balance, qint64_t stake, qint64_t unconfirmedBalance)
+void SendCoinsDialog::setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance)
 {
     Q_UNUSED(stake);
     Q_UNUSED(unconfirmedBalance);

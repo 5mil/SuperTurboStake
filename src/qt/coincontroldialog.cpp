@@ -22,7 +22,7 @@
 #include <QTreeWidgetItem>
 
 using namespace std;
-QList<std::pair<QString, qint64_t> > CoinControlDialog::payAddresses;
+QList<std::pair<QString, qint64> > CoinControlDialog::payAddresses;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
 
 CoinControlDialog::CoinControlDialog(QWidget *parent) :
@@ -416,14 +416,14 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
     if (!model) return;
 
     // nPayAmount
-    qint64_t nPayAmount = 0;
+    qint64 nPayAmount = 0;
     bool fLowOutput = false;
     bool fDust = false;
     CTransaction txDummy;
 
-    BOOST_FOREACH(const PAIRTYPE(QString, qint64_t) &payee, CoinControlDialog::payAddresses)
+    BOOST_FOREACH(const PAIRTYPE(QString, qint64) &payee, CoinControlDialog::payAddresses)
     {
-        qint64_t amount = payee.second;
+        qint64 amount = payee.second;
         nPayAmount += amount;
 
         if (amount > 0)
@@ -477,10 +477,10 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         }
 
         // Outputs
-        BOOST_FOREACH(const PAIRTYPE(QString, qint64_t) &payee, CoinControlDialog::payAddresses)
+        BOOST_FOREACH(const PAIRTYPE(QString, qint64) &payee, CoinControlDialog::payAddresses)
         {
             QString address = payee.first;
-            qint64_t amount = payee.second;
+            qint64 amount = payee.second;
             CScript scriptPubKey;
             scriptPubKey.SetDestination(CBitcoinAddress(address.toStdString()).Get());
             CTxOut txout(amount, scriptPubKey);

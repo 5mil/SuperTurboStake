@@ -69,7 +69,7 @@ bool ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption)
     bool payFee = false;
 
     QMetaObject::invokeMethod(guiref, "askFee", GUIUtil::blockingGUIThreadConnection(),
-                               Q_ARG(qint64_t, nFeeRequired),
+                               Q_ARG(qint64, nFeeRequired),
                                Q_ARG(bool*, &payFee));
 
     return payFee;

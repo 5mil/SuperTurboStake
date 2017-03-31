@@ -26,7 +26,7 @@ public:
       @note Type filter takes a bitfield created with TYPE() or ALL_TYPES
      */
     void setTypeFilter(quint32 modes);
-    void setMinAmount(qint64_t minimum);
+    void setMinAmount(qint64 minimum);
 
     /** Set maximum number of rows returned, -1 if unlimited. */
     void setLimit(int limit);
@@ -40,7 +40,7 @@ private:
     QDateTime dateTo;
     QString addrPrefix;
     quint32 typeFilter;
-    qint64_t minAmount;
+    qint64 minAmount;
     int limitRows;
 
 signals:

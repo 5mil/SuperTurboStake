@@ -23,22 +23,22 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     transactionTableModel = new TransactionTableModel(wallet, this);
 }
 
-qint64_t WalletModel::getBalance() const
+qint64 WalletModel::getBalance() const
 {
     return wallet->GetBalance();
 }
 
-qint64_t WalletModel::getStake() const
+qint64 WalletModel::getStake() const
 {
     return wallet->GetStake();
 }
 
-qint64_t WalletModel::getNewMint() const
+qint64 WalletModel::getNewMint() const
 {
     return wallet->GetNewMint();
 }
 
-qint64_t WalletModel::getUnconfirmedBalance() const
+qint64 WalletModel::getUnconfirmedBalance() const
 {
     return wallet->GetUnconfirmedBalance();
 }
@@ -55,9 +55,9 @@ int WalletModel::getNumTransactions() const
 
 void WalletModel::update()
 {
-    qint64_t newBalance = getBalance();
-    qint64_t newStake = getStake();
-    qint64_t newUnconfirmedBalance = getUnconfirmedBalance() + getNewMint();
+    qint64 newBalance = getBalance();
+    qint64 newStake = getStake();
+    qint64 newUnconfirmedBalance = getUnconfirmedBalance() + getNewMint();
     int newNumTransactions = getNumTransactions();
     EncryptionStatus newEncryptionStatus = getEncryptionStatus();
 
@@ -89,7 +89,7 @@ bool WalletModel::validateAddress(const QString &address)
 
 WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl)
 {
-    qint64_t total = 0;
+    qint64 total = 0;
     QSet<QString> setAddress;
     QString hex;
 
